@@ -29,6 +29,20 @@ async function run() {
   try {
     const foodsCollection = client.db("sharePlate").collection("foods");
 
+    // Get all foods data form db sorted by quantity
+    app.get("/foods", async (req, res) => {
+      let sort = {};
+      if (req.query?.sort === "descending") {
+        sort = { food_quantity: -1 };
+      }
+      let limit = 0;
+      if (req.query?.limit) {
+        limit = parseInt(req.query.limit);
+      }
+      const result = await foodsCollection.find().sort(sort).limit(limit).toArray();
+      res.send(result);
+    });
+
     // Add new food data to db
     app.post("/foods", async (req, res) => {
       const addedFood = req.body;
