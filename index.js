@@ -31,6 +31,10 @@ async function run() {
 
     // Get all foods data form db sorted by quantity
     app.get("/foods", async (req, res) => {
+      let query = {};
+      if (req.query?.status === "Available") {
+        query = { food_status: req.query.status };
+      }
       let sort = {};
       if (req.query?.sort === "descending") {
         sort = { food_quantity: -1 };
@@ -39,7 +43,8 @@ async function run() {
       if (req.query?.limit) {
         limit = parseInt(req.query.limit);
       }
-      const result = await foodsCollection.find().sort(sort).limit(limit).toArray();
+
+      const result = await foodsCollection.find(query).sort(sort).limit(limit).toArray();
       res.send(result);
     });
 
