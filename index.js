@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
 const app = express();
@@ -37,9 +37,11 @@ async function run() {
     // Get all foods data form db sorted by quantity
     app.get("/foods", async (req, res) => {
       let query = {};
+      // Get the food data with status "Available"
       if (req.query?.status === "Available") {
         query = { food_status: req.query.status };
       }
+      // Get the available foods data sorted by food quantity
       let sort = {};
       if (req.query?.sort === "descending") {
         sort = { food_quantity: -1 };
@@ -50,6 +52,14 @@ async function run() {
       }
 
       const result = await foodsCollection.find(query).sort(sort).limit(limit).toArray();
+      res.send(result);
+    });
+
+    // Get a single food data
+    app.get("/foods/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await foodsCollection.findOne(query);
       res.send(result);
     });
 
