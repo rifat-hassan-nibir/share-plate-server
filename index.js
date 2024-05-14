@@ -34,13 +34,14 @@ async function run() {
   try {
     const foodsCollection = client.db("sharePlate").collection("foods");
 
-    // Get all foods data form db sorted by quantity
+    // Get all the available foods data form db in available foods page
     app.get("/foods", async (req, res) => {
       let query = {};
       // Get the food data with status "Available"
       if (req.query?.status === "Available") {
         query = { food_status: req.query.status };
       }
+
       // Get the available foods data sorted by food quantity
       let sort = {};
       if (req.query?.sort === "descending") {
@@ -55,11 +56,21 @@ async function run() {
       res.send(result);
     });
 
-    // Get a single food data
+    // Get a single food data by id
     app.get("/foods/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await foodsCollection.findOne(query);
+      res.send(result);
+    });
+
+    // Get all food data under an email
+    app.get("/foods/my-foods/:email", async (req, res) => {
+      const email = req.params.email;
+      console.log(email);
+      const query = { "donator_details.email": email };
+      const result = await foodsCollection.find(query).toArray();
+      console.log(result);
       res.send(result);
     });
 
