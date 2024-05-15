@@ -68,10 +68,8 @@ async function run() {
     // Get all food data under an email
     app.get("/foods/my-foods/:email", async (req, res) => {
       const email = req.params.email;
-      console.log(email);
       const query = { "donator_details.email": email };
       const result = await foodsCollection.find(query).toArray();
-      console.log(result);
       res.send(result);
     });
 
@@ -99,11 +97,18 @@ async function run() {
       res.send(result);
     });
 
+    // Delete food data
+    app.delete("/delete-food/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await foodsCollection.deleteOne(query);
+      res.send(result);
+    });
+
     // Update food data
     app.put("/update-food/:id", async (req, res) => {
       const id = req.params.id;
       const data = req.body;
-      console.log(data);
       const filter = { _id: new ObjectId(id) };
       const options = { upsert: true };
       const updateDoc = {
