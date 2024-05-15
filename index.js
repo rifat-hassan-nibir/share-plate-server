@@ -95,8 +95,23 @@ async function run() {
         },
       };
       const updatedFoodStatus = await foodsCollection.updateOne(filter, updateDoc);
-      console.log(updatedFoodStatus);
 
+      res.send(result);
+    });
+
+    // Update food data
+    app.put("/update-food/:id", async (req, res) => {
+      const id = req.params.id;
+      const data = req.body;
+      console.log(data);
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          ...data,
+        },
+      };
+      const result = await foodsCollection.updateOne(filter, updateDoc, options);
       res.send(result);
     });
   } finally {
