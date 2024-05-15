@@ -73,6 +73,14 @@ async function run() {
       res.send(result);
     });
 
+    // Get requested food using email
+    app.get("/foods/my-requested-foods/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { user_email: email };
+      const result = await requestedFoodsCollection.find(query).toArray();
+      res.send(result);
+    });
+
     // Add new food data to db
     app.post("/foods", async (req, res) => {
       const addedFood = req.body;
