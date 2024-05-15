@@ -33,6 +33,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const foodsCollection = client.db("sharePlate").collection("foods");
+    const requestedFoodsCollection = client.db("sharePlate").collection("requestedFoods");
 
     // Get all the available foods data form db in available foods page
     app.get("/foods", async (req, res) => {
@@ -78,6 +79,24 @@ async function run() {
     app.post("/foods", async (req, res) => {
       const addedFood = req.body;
       const result = await foodsCollection.insertOne(addedFood);
+      res.send(result);
+    });
+
+    // Add new requested food data to requested food collection
+    app.post("/requested-foods", async (req, res) => {
+      const foodData = req.body;
+      const result = await requestedFoodsCollection.insertOne(foodData);
+
+      // Update the food_status of the requested food
+      const filter = { _id: new ObjectId(foodData.food_id) };
+      const updateDoc = {
+        $set: {
+          food_status: foodData.food_status,
+        },
+      };
+      const updatedFoodStatus = await foodsCollection.updateOne(filter, updateDoc);
+      console.log(updatedFoodStatus);
+
       res.send(result);
     });
   } finally {
