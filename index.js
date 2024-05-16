@@ -39,9 +39,11 @@ async function run() {
     app.get("/foods", async (req, res) => {
       let query = {};
       // Get the food data with status "Available"
-      if (req.query?.status === "Available") {
-        query = { food_status: req.query.status };
-      }
+      const status = req.query?.status;
+      if (status === "Available") query = { food_status: status };
+
+      const search = req.query?.search;
+      if (search) query = { food_name: { $regex: search, $options: "i" }, food_status: status };
 
       // Sort the available foods data
       const quantitySort = req.query?.quantity_sort;
@@ -54,9 +56,7 @@ async function run() {
       if (dateSort === "Oldest") sort = { expire_date: 1 };
 
       let limit = 0;
-      if (req.query?.limit) {
-        limit = parseInt(req.query.limit);
-      }
+      if (req.query?.limit) limit = parseInt(req.query.limit);
 
       const result = await foodsCollection.find(query).sort(sort).limit(limit).toArray();
       res.send(result);
