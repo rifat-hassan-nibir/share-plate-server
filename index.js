@@ -34,24 +34,24 @@ const client = new MongoClient(uri, {
 });
 
 // middlewares
-const logger = (req, res, next) => {
-  console.log("log: info", req.method, req.url);
-  next();
-};
+// const logger = (req, res, next) => {
+//   console.log("log: info", req.method, req.url);
+//   next();
+// };
 
-const verifyToken = (req, res, next) => {
-  const token = req?.cookies?.token;
-  if (!token) {
-    return res.status(401).send({ message: "unauthorized access" });
-  }
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(401).send({ message: "unauthorized access" });
-    }
-    req.user = decoded;
-    next();
-  });
-};
+// const verifyToken = (req, res, next) => {
+//   const token = req?.cookies?.token;
+//   if (!token) {
+//     return res.status(401).send({ message: "unauthorized access" });
+//   }
+//   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+//     if (err) {
+//       return res.status(401).send({ message: "unauthorized access" });
+//     }
+//     req.user = decoded;
+//     next();
+//   });
+// };
 
 // Cookie Options
 const cookieOptions = {
@@ -117,24 +117,24 @@ async function run() {
     });
 
     // Get all food data under an email
-    app.get("/foods/my-foods/:email", logger, verifyToken, async (req, res) => {
+    app.get("/foods/my-foods/:email", async (req, res) => {
       const email = req.params.email;
-      console.log("token owner info", req.user);
-      if (req.user.email !== email) {
-        return res.status(403).send({ message: "forbidden access" });
-      }
+      // console.log("token owner info", req.user);
+      // if (req.user.email !== email) {
+      //   return res.status(403).send({ message: "forbidden access" });
+      // }
       const query = { "donator_details.email": email };
       const result = await foodsCollection.find(query).toArray();
       res.send(result);
     });
 
     // Get requested food using email
-    app.get("/foods/my-requested-foods/:email", logger, verifyToken, async (req, res) => {
+    app.get("/foods/my-requested-foods/:email", async (req, res) => {
       const email = req.params.email;
-      console.log("token owner info", req.user);
-      if (req.user.email !== email) {
-        return res.status(403).send({ message: "forbidden access" });
-      }
+      // console.log("token owner info", req.user);
+      // if (req.user.email !== email) {
+      //   return res.status(403).send({ message: "forbidden access" });
+      // }
       const query = { user_email: email };
       const result = await requestedFoodsCollection.find(query).toArray();
       res.send(result);
