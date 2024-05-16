@@ -43,11 +43,16 @@ async function run() {
         query = { food_status: req.query.status };
       }
 
-      // Get the available foods data sorted by food quantity
+      // Sort the available foods data
+      const quantitySort = req.query?.quantity_sort;
+      const dateSort = req.query?.date_sort;
+
       let sort = {};
-      if (req.query?.sort === "descending") {
-        sort = { food_quantity: -1 };
-      }
+
+      if (quantitySort === "Descending") sort = { food_quantity: -1 };
+      if (dateSort === "Latest") sort = { expire_date: -1 };
+      if (dateSort === "Oldest") sort = { expire_date: 1 };
+
       let limit = 0;
       if (req.query?.limit) {
         limit = parseInt(req.query.limit);
