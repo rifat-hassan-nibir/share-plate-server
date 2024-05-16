@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
@@ -34,6 +35,28 @@ async function run() {
   try {
     const foodsCollection = client.db("sharePlate").collection("foods");
     const requestedFoodsCollection = client.db("sharePlate").collection("requestedFoods");
+
+    // Auth related api
+    app.post("/jwt", async (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
+
+      console.log("token for", user);
+
+      res
+        .cookie("token", token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+        })
+        .send({ token });
+    });
+
+    app.post("/logout", async (req, res) => {
+      const user = req.body;
+      console.log("loggin out", user);
+      res.clearCookie("token", { maxAge: 0 }).send({ success: true });
+    });
 
     // Get all the available foods data form db in available foods page
     app.get("/foods", async (req, res) => {
