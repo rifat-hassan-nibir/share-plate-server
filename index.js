@@ -53,6 +53,13 @@ const verifyToken = (req, res, next) => {
   });
 };
 
+// Cookie Options
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production" ? true : false,
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+};
+
 async function run() {
   try {
     const foodsCollection = client.db("sharePlate").collection("foods");
@@ -65,19 +72,13 @@ async function run() {
 
       console.log("token for", user);
 
-      res
-        .cookie("token", token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-        })
-        .send({ token });
+      res.cookie("token", token, cookieOptions).send({ success: true });
     });
 
     app.post("/logout", async (req, res) => {
       const user = req.body;
       console.log("loggin out", user);
-      res.clearCookie("token", { maxAge: 0 }).send({ success: true });
+      res.clearCookie("token", { ...cookieOptions, maxAge: 0 }).send({ success: true });
     });
 
     // Get all the available foods data form db in available foods page
