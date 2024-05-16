@@ -141,7 +141,7 @@ async function run() {
     });
 
     // Add new food data to db
-    app.post("/foods", async (req, logger, verifyToken, res) => {
+    app.post("/foods", async (req, res) => {
       const addedFood = req.body;
       const result = await foodsCollection.insertOne(addedFood);
       res.send(result);
